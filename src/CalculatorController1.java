@@ -1,10 +1,16 @@
+import java.util.Set;
+import java.util.Stack;
+
 public class CalculatorController1 implements CalculatorController {
 
     private final CalculatorModel model;
 
     private final CalculatorView view;
 
-    public CalculatorController1(CalculatorModel model, CalculatorView view){
+    //private final Set<Character> addNotAllowed, subtractNotAllowed, divisionNotAllowed, multiplyNotAllowed, RightPNotAllowed;
+
+
+    protected CalculatorController1(CalculatorModel model, CalculatorView view){
         this.model = model;
         this.view = view;
         updateViewToMatchModel(model, view);
@@ -49,7 +55,14 @@ public class CalculatorController1 implements CalculatorController {
 
     @Override
     public void processEnterEvent() {
-        this.model.setBottom("" + eval(this.model.getTopLeft() + this.model.getTopRight()));
+        if(!isValid(this.model.getTopLeft() + this.model.getTopRight())){
+            this.model.setBottom("InValid Expression");
+        }else{
+            long[] res= eval(this.model.getTopLeft() + this.model.getTopRight());
+            this.model.setBottom(res[0] + " / " + res[1]);
+        }
+        //else
+            //this.model.setBottom("" + eval(this.model.getTopLeft() + this.model.getTopRight()));
         updateViewToMatchModel(model, view);
     }
 
@@ -87,8 +100,99 @@ public class CalculatorController1 implements CalculatorController {
         updateViewToMatchModel(model, view);
     }
 
-    private int eval(String s){
-        //TODO
-        return -1;
+    private long[] eval(String s){
+        System.out.println(s);
+        Stack<Long> stack = new Stack<>();
+        long[] cur = new long[]{0,1}, pre = new long[]{0,1}, ans = new long[]{0,1};
+        long sign = 1;
+        int state = 0;
+        s += "+";
+        for(int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)){
+                cur[0] = cur[0] * 10 + Long.parseLong("" + c);
+            } else{
+                if(state == 1)
+                    pre = time(pre, cur);
+                else if(state == 2)
+                    pre = divide(pre, cur);
+                else
+                    pre = cur;
+                cur = new long[]{0,1};
+                if(c == '-' || c == '+'){
+                    System.out.println("sign: " + sign);
+                    pre = time(pre, new long[]{sign, 1});
+                    System.out.println("pre[0]: " + pre[0] + "pre[1]: " + pre[1]);
+                    ans = add(ans, pre);
+                    state = 0;
+                    pre = new long[]{0,1};
+                    sign = c == '+' ? 1 : -1;
+                }else{
+                    state = c == '*'? 1 : 2;
+                }
+            }
+        }
+        return ans;
+    }
+
+
+    private long[] divide(long[] a, long[] b){
+        long n = a[0] * b[1], d = a[1] * b[0];
+        return simplifyFraction(n, d);
+    }
+
+    private long[] time(long[] a, long[] b){
+        long n = a[0] * b[0], d = a[1]  *  b[1];
+        return simplifyFraction(n, d);
+    }
+
+    private long[] add(long[] a, long[] b){
+        long n = a[0] * b[1] + b[0] * a[1], d = a[1]  *  b[1];
+        return simplifyFraction(n, d);
+    }
+
+    private long[] subtract(long[] a, long[] b){
+        long n = a[0] * b[1] - b[0] * a[1], d = a[1]  *  b[1];
+        return simplifyFraction(n, d);
+    }
+
+    public long[] simplifyFraction(long a, long b){
+        long gcd = gcd(a, b);
+        return new long[]{a / gcd, b / gcd};
+    }
+
+    private long gcd(long a, long b){
+        return b == 0? a: gcd(b, a % b);
+    }
+
+    private boolean isValid(String s){
+        //Check parentheses
+        int left = 0;
+        for(char c : s.toCharArray()) {
+            if (c == '('){
+                left ++;
+            }else if(c == ')')
+                left --;
+            if(left < 0)
+                return false;
+        }
+        if(left != 0) return false;
+
+        //Check syntax
+        for(int i = 0; i < s.length(); ++i){
+            char cur = s.charAt(i);
+            if(cur == '*' || cur == '/'){
+                if(i == 0)
+                    return false;
+                char pre = s.charAt(i - 1);
+                if(pre == '-' || pre == '+' || pre == '(' || pre == '*' || pre == '/')
+                    return false;
+            }else if(cur == ')'){
+                char pre = s.charAt(i - 1);
+                if(!Character.isDigit(pre) && pre != ')')
+                    return false;
+            }
+        }
+        return true;
     }
 }

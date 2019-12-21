@@ -45,7 +45,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         this.bRightParen = new JButton(")");
         this.bLeftArrow = new JButton("<-");
         this.bRightArrow = new JButton("->");
-        this.bTran = new JButton("<->");
+        this.bTran = new JButton("d<->f");
         this.bDelete = new JButton("Delete");
         this.bDigits = new JButton[10];
         for (int i = 0; i < 10; ++i) {
@@ -99,27 +99,15 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
 
         JPanel combinedButtonPanel = new JPanel(new FlowLayout());
 
-        /*
-         * Add the other two button panels to the combined button panel
-         */
+
         combinedButtonPanel.add(mainButtonPanel);
         combinedButtonPanel.add(sideButtonPanel);
-        /*
-         * Organize main window
-         */
+
         this.setLayout(new GridLayout(CALC_GRID_ROWS, CALC_GRID_COLUMNS));
-        /*
-         * Add scroll panes and button panel to main window, from left to right
-         * and top to bottom
-         */
         this.add(tTopScrollPane);
         this.add(tBottomScrollPane);
         this.add(combinedButtonPanel);
-        // Set up the observers ----------------------------------------------
 
-        /*
-         * Register this object as the observer for all GUI events
-         */
         for (JButton b : this.bDigits) {
             b.addActionListener(this);
         }
@@ -141,6 +129,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
     }
+
     @Override
     public void registerObserver(CalculatorController controller) {
         this.controller = controller;
@@ -170,7 +159,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         } else if (source == this.bDivide) {
             this.controller.processEditEvent('/');
         } else if (source == this.bLeftParen) {
-            System.out.println("pressed");
+            //System.out.println("pressed");
             this.controller.processEditEvent('(');
         } else if (source == this.bRightParen) {
             this.controller.processEditEvent(')');
@@ -187,7 +176,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         }else{
             for(int i = 0; i < DIGIT_BUTTONS; ++i){
                 if(source == this.bDigits[i]){
-                    System.out.println((char)(i + '0'));
+                    //System.out.println((char)(i + '0'));
                     this.controller.processEditEvent((char)(i + '0'));
                 }
             }
