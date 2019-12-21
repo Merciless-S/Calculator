@@ -1,23 +1,39 @@
 public class CalculatorModel1 implements CalculatorModel {
 
-    private String top, bottom;
+    private String topLeft, topRight, bottom;
 
     public CalculatorModel1(){
-        this.top = "";
+        this.topLeft = "";
+        this.topRight = "";
         this.bottom = "";
     }
-    public String getTop(){
-        return this.top;
+
+    @Override
+    public String getTopLeft(){
+        return this.topLeft;
     }
 
+    @Override
+    public String getTopRight(){
+        return this.topRight;
+    }
+
+    @Override
     public String getBottom(){
         return this.bottom;
     }
 
-    public void setTop(String top){
-        this.top = top;
+    @Override
+    public void setTopLeft(String s){
+        this.topLeft = s;
     }
 
+    @Override
+    public void setTopRight(String s) {
+        this.topRight = s;
+    }
+
+    @Override
     public void setBottom(String bottom){
         this.bottom = bottom;
     }

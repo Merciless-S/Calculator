@@ -1,11 +1,14 @@
 public interface CalculatorModel {
     
-    String getTop();
+    String getTopLeft();
+
+    String getTopRight();
 
     String getBottom();
 
     void setBottom(String bottom);
 
-    void setTop(String top);
+    void setTopLeft(String s);
 
+    void setTopRight(String s);
 }

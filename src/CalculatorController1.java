@@ -11,42 +11,64 @@ public class CalculatorController1 implements CalculatorController {
     }
 
     private static void updateViewToMatchModel(CalculatorModel model, CalculatorView view){
-        String top = model.getTop(), bottom = model.getBottom();
-        view.updateTopDisplay(top);
+        String topLeft = model.getTopLeft(), topRight = model.getTopRight(), bottom = model.getBottom();
+        view.updateTopDisplay(topLeft + "|" + topRight);
         view.updateBottomDisplay(bottom);
     }
 
     @Override
     public void processClearEvent() {
-        if(this.model.getTop().length() == 0)
+        if((this.model.getTopLeft() + this.model.getTopRight()).length() == 0)
             this.model.setBottom("");
-        else
-            this.model.setTop("");
+        else {
+            this.model.setTopLeft("");
+            this.model.setTopRight("");
+        }
+        updateViewToMatchModel(model, view);
     }
 
     @Override
     public void processEnterEvent() {
-
+        this.model.setBottom("" + eval(this.model.getTopLeft() + this.model.getTopRight()));
+        updateViewToMatchModel(model, view);
     }
 
     @Override
     public void processDeleteEvent() {
-
+        String temp = this.model.getTopLeft();
+        if (temp.length() > 0){
+            this.model.setTopLeft(temp.substring(0,temp.length()-1));
+        }
+        updateViewToMatchModel(model, view);
     }
 
     @Override
     public void processEditEvent(char c) {
-
+        this.model.setTopLeft(this.model.getTopLeft() + c);
+        updateViewToMatchModel(model, view);
     }
 
 
     @Override
     public void processTranEvent() {
-
+        //TODO
     }
 
     @Override
-    public void processSwitchEvent(int i) {
+    public void processShiftEvent(int i) {
+        String left = this.model.getTopLeft(), right = this.model.getTopRight();
+        if(i > 0 && right.length() > 0){
+            this.model.setTopLeft(left + right.charAt(0));
+            this.model.setTopRight(right.substring(1));
+        }else if(i < 0 && left.length() > 0){
+            this.model.setTopRight(left.charAt(left.length() - 1) + right);
+            this.model.setTopLeft(left.substring(0, left.length() - 1));
+        }
+        updateViewToMatchModel(model, view);
+    }
 
+    private int eval(String s){
+        //TODO
+        return -1;
     }
 }

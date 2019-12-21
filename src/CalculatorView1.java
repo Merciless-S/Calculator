@@ -1,4 +1,4 @@
-import java.awt.Cursor;
+//import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -133,6 +133,10 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         this.bPower.addActionListener(this);
         this.bRoot.addActionListener(this);
         this.bDelete.addActionListener(this);
+        this.bLeftParen.addActionListener(this);
+        this.bRightParen.addActionListener(this);
+        this.bLeftArrow.addActionListener(this);
+        this.bRightArrow.addActionListener(this);
         this.pack();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -166,13 +170,14 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         } else if (source == this.bDivide) {
             this.controller.processEditEvent('/');
         } else if (source == this.bLeftParen) {
+            System.out.println("pressed");
             this.controller.processEditEvent('(');
         } else if (source == this.bRightParen) {
             this.controller.processEditEvent(')');
         } else if (source == this.bLeftArrow) {
-            this.controller.processSwitchEvent(-1);
+            this.controller.processShiftEvent(-1);
         } else if (source == this.bRightArrow) {
-            this.controller.processSwitchEvent(1);
+            this.controller.processShiftEvent(1);
         } else if (source == this.bEnter) {
             this.controller.processEnterEvent();
         }else if (source == this.bDelete){
@@ -182,7 +187,8 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         }else{
             for(int i = 0; i < DIGIT_BUTTONS; ++i){
                 if(source == this.bDigits[i]){
-                    this.controller.processEditEvent((char)i);
+                    System.out.println((char)(i + '0'));
+                    this.controller.processEditEvent((char)(i + '0'));
                 }
             }
         }

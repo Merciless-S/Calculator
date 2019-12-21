@@ -9,7 +9,7 @@ public interface CalculatorController {
 
     void processTranEvent();
 
-    void processSwitchEvent(int i);
+    void processShiftEvent(int i);
 
 
 }
