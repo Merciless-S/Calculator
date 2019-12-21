@@ -12,7 +12,27 @@ public class CalculatorController1 implements CalculatorController {
 
     private static void updateViewToMatchModel(CalculatorModel model, CalculatorView view){
         String topLeft = model.getTopLeft(), topRight = model.getTopRight(), bottom = model.getBottom();
-        view.updateTopDisplay(topLeft + "|" + topRight);
+        StringBuilder left = new StringBuilder(), right = new StringBuilder();
+        if(topLeft.length() > 0) {
+            for (char c : topLeft.toCharArray()) {
+                left.append(c + " ");
+            }
+
+        }
+        if(topRight.length() > 0) {
+            for (char c : topRight.toCharArray()) {
+                right.append(c + " ");
+            }
+            right.deleteCharAt(right.length() - 1);
+            if(left.length() > 0)
+                left.deleteCharAt(left.length() - 1);
+            left.append("|");
+            left.append(right);
+        }else{
+            left.append("|");
+        }
+        //view.updateTopDisplay(topLeft + "|" + topRight);
+        view.updateTopDisplay(left.toString());
         view.updateBottomDisplay(bottom);
     }
 
