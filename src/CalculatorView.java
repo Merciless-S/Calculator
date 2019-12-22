@@ -6,4 +6,6 @@ public interface CalculatorView extends ActionListener {
     void updateTopDisplay(String s);
 
     void updateBottomDisplay(String s);
+
+    void updateTranAllowed(boolean allowed);
 }

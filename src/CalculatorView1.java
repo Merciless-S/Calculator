@@ -146,6 +146,11 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
     }
 
     @Override
+    public void updateTranAllowed(boolean allowed) {
+        this.bTran.setEnabled(allowed);
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source == this.bClear) {
