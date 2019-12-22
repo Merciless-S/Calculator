@@ -1,6 +1,7 @@
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 
-public interface CalculatorView extends ActionListener {
+public interface CalculatorView extends ActionListener  {
     void registerObserver(CalculatorController controller);
 
     void updateTopDisplay(String s);

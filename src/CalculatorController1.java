@@ -1,6 +1,11 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Stack;
 
+/**
+ * @author Merciless
+ */
 public class CalculatorController1 implements CalculatorController {
 
     private final CalculatorModel model;
@@ -56,7 +61,18 @@ public class CalculatorController1 implements CalculatorController {
         if(!isValid(this.model.getTopLeft() + this.model.getTopRight())){
             this.model.setBottom("InValid Expression");
         }else {
-            long[] res = eval(this.model.getTopLeft() + this.model.getTopRight());
+            long[] res;
+            try {
+                res = eval(this.model.getTopLeft() + this.model.getTopRight());
+            }catch(ArithmeticException e){
+                this.model.setBottom("NaN");
+                updateViewToMatchModel(model, view);
+                return;
+            }catch(NumberFormatException e){
+                this.model.setBottom("Invalid float number");
+                updateViewToMatchModel(model, view);
+                return;
+            }
             if (res[1] == 1) {
                 this.model.setBottom("" + res[0]);
             } else if (res[1] == 0) {
@@ -101,12 +117,22 @@ public class CalculatorController1 implements CalculatorController {
     @Override
     public void processShiftEvent(int i) {
         String left = this.model.getTopLeft(), right = this.model.getTopRight();
-        if(i > 0 && right.length() > 0){
-            this.model.setTopLeft(left + right.charAt(0));
-            this.model.setTopRight(right.substring(1));
-        }else if(i < 0 && left.length() > 0){
-            this.model.setTopRight(left.charAt(left.length() - 1) + right);
-            this.model.setTopLeft(left.substring(0, left.length() - 1));
+        if(i > 0){
+             if(right.length() > 0) {
+                 this.model.setTopLeft(left + right.charAt(0));
+                 this.model.setTopRight(right.substring(1));
+             }else{
+                 this.model.setTopRight(left + right);
+                 this.model.setTopLeft("");
+             }
+        }else if(i < 0){
+            if(left.length() > 0) {
+                this.model.setTopRight(left.charAt(left.length() - 1) + right);
+                this.model.setTopLeft(left.substring(0, left.length() - 1));
+            }else{
+                this.model.setTopLeft(left + right);
+                this.model.setTopRight("");
+            }
         }
         updateViewToMatchModel(model, view);
     }
@@ -116,20 +142,22 @@ public class CalculatorController1 implements CalculatorController {
         long[] cur = new long[]{0,1}, pre = new long[]{0,1}, ans = new long[]{0,1};
         long sign = 1;
         int state = 0;
+        StringBuilder builder = new StringBuilder();
         boolean flag = false;
         s += "+";
         for(int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if(i > 0 && (c == '(' && Character.isDigit(s.charAt(i - 1)) || Character.isDigit(c) && s.charAt(i - 1) == ')')){
+            if(i > 0 && (c == '(' && (Character.isDigit(s.charAt(i - 1)) || s.charAt(i - 1) == '.') || (c == '.' || Character.isDigit(c)) && s.charAt(i - 1) == ')')){
                 if(!flag){
                     c = '*';
                     i --;
                 }
                 flag = !flag;
             }
-            if (Character.isDigit(c)){
-                cur[0] = cur[0] * 10 + Long.parseLong("" + c);
-            } else if((c == '+' || c =='-') && (i == 0 || !Character.isDigit(s.charAt(i - 1)) && s.charAt(i - 1) != ')')){
+            if (Character.isDigit(c) || c == '.'){
+                builder.append(c);
+                //cur[0] = cur[0] * 10 + Long.parseLong("" + c);
+            } else if((c == '+' || c =='-') && (i == 0 || !(Character.isDigit(s.charAt(i - 1)) || s.charAt(i - 1) == '.') && s.charAt(i - 1) != ')')){
                 if(c == '-') sign *= -1;
             } else if(c == '('){
                 stack.push(new Point(sign, ans, pre, state));
@@ -138,6 +166,10 @@ public class CalculatorController1 implements CalculatorController {
                 sign = 1;
                 pre = new long[]{0,1};
             }else{
+                if(builder.length() > 0){
+                    cur = convertDoubleToFraction(builder.toString());
+                }
+                builder = new StringBuilder();
                 if(state == 1)
                     pre = time(pre, cur);
                 else if(state == 2)
@@ -158,10 +190,8 @@ public class CalculatorController1 implements CalculatorController {
                     state = 0;
                     pre = new long[]{0,1};
                     sign = c == '+' ? 1 : -1;
-                    cur = new long[]{0,1};
                 }else{
                     state = c == '*'? 1 : 2;
-                    cur = new long[]{0,1};
                 }
             }
         }
@@ -199,7 +229,7 @@ public class CalculatorController1 implements CalculatorController {
 
     private boolean isValid(String s){
         //check the last character of the expression
-        if(s.length() > 0 && ! Character.isDigit(s.charAt(s.length() - 1)) && s.charAt(s.length() - 1) != ')')
+        if(s.length() > 0 && ! Character.isDigit(s.charAt(s.length() - 1)) && s.charAt(s.length() - 1) != ')' && s.charAt(s.length() - 1) != '.')
             return false;
         //Check parentheses
         int left = 0;
@@ -251,5 +281,15 @@ public class CalculatorController1 implements CalculatorController {
         result.insert(index, "(");
         result.append(")");
         return result.toString().replace("(0)", "");
+    }
+
+    public long[] convertDoubleToFraction(String s){
+        double a = Double.parseDouble(s);
+        String newS = Double.toString(a);
+        String[] fraction = newS.split("\\.");
+
+        long bottom = (new Double(Math.pow(10, fraction[1].length()))).longValue();
+        long top = Long.parseLong(fraction[0] + "" + fraction[1]);
+        return simplifyFraction(top, bottom);
     }
 }

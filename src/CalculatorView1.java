@@ -2,6 +2,7 @@
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,11 +17,11 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
     private final JTextArea tTop, tBottom;
 
     private final JButton bClear, bEnter, bDelete, bAdd, bSubtract, bMultiply,
-            bDivide, bPower, bRoot, bLeftParen, bRightParen, bLeftArrow, bRightArrow, bTran;
+            bDivide, bPower, bRoot, bLeftParen, bRightParen, bLeftArrow, bRightArrow, bTran, bDot;
 
     private static final int TEXT_AREA_HEIGHT = 5, TEXT_AREA_WIDTH = 20,
             DIGIT_BUTTONS = 10, MAIN_BUTTON_PANEL_GRID_ROWS = 5,
-            MAIN_BUTTON_PANEL_GRID_COLUMNS = 4, SIDE_BUTTON_PANEL_GRID_ROWS = 4,
+            MAIN_BUTTON_PANEL_GRID_COLUMNS = 4, SIDE_BUTTON_PANEL_GRID_ROWS = 5,
             SIDE_BUTTON_PANEL_GRID_COLUMNS = 1, CALC_GRID_ROWS = 3,
             CALC_GRID_COLUMNS = 1;
     /**
@@ -48,6 +49,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         this.bTran = new JButton("d<->f");
         this.bDelete = new JButton("Delete");
         this.bDigits = new JButton[10];
+        this.bDot = new JButton(".");
         for (int i = 0; i < 10; ++i) {
             this.bDigits[i] = new JButton("" + i);
         }
@@ -89,6 +91,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         mainButtonPanel.add(this.bLeftArrow);
         mainButtonPanel.add(this.bRightArrow);
 
+
         JPanel sideButtonPanel = new JPanel(new GridLayout(
                 SIDE_BUTTON_PANEL_GRID_ROWS, SIDE_BUTTON_PANEL_GRID_COLUMNS));
 
@@ -96,6 +99,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         sideButtonPanel.add(this.bEnter);
         sideButtonPanel.add(this.bDelete);
         sideButtonPanel.add(this.bTran);
+        sideButtonPanel.add(this.bDot);
 
         JPanel combinedButtonPanel = new JPanel(new FlowLayout());
 
@@ -125,6 +129,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
         this.bRightParen.addActionListener(this);
         this.bLeftArrow.addActionListener(this);
         this.bRightArrow.addActionListener(this);
+        this.bDot.addActionListener(this);
         this.pack();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -168,6 +173,8 @@ public class CalculatorView1 extends JFrame implements CalculatorView {
             this.controller.processEditEvent('(');
         } else if (source == this.bRightParen) {
             this.controller.processEditEvent(')');
+        } else if (source == this.bDot) {
+            this.controller.processEditEvent('.');
         } else if (source == this.bLeftArrow) {
             this.controller.processShiftEvent(-1);
         } else if (source == this.bRightArrow) {
