@@ -11,5 +11,4 @@ public interface CalculatorController {
 
     void processShiftEvent(int i);
 
-
 }

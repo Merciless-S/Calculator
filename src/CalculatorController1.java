@@ -1,5 +1,4 @@
 import java.util.HashMap;
-import java.util.Set;
 import java.util.Stack;
 
 public class CalculatorController1 implements CalculatorController {
@@ -7,9 +6,6 @@ public class CalculatorController1 implements CalculatorController {
     private final CalculatorModel model;
 
     private final CalculatorView view;
-
-    //private final Set<Character> addNotAllowed, subtractNotAllowed, divisionNotAllowed, multiplyNotAllowed, RightPNotAllowed;
-
 
     protected CalculatorController1(CalculatorModel model, CalculatorView view){
         this.model = model;
@@ -63,7 +59,7 @@ public class CalculatorController1 implements CalculatorController {
             long[] res = eval(this.model.getTopLeft() + this.model.getTopRight());
             if (res[1] == 1) {
                 this.model.setBottom("" + res[0]);
-            } else if (res[0] == 0) {
+            } else if (res[1] == 0) {
                 this.model.setBottom("NaN");
             } else {
                 this.model.setBottom(res[0] + " / " + res[1]);
@@ -120,9 +116,17 @@ public class CalculatorController1 implements CalculatorController {
         long[] cur = new long[]{0,1}, pre = new long[]{0,1}, ans = new long[]{0,1};
         long sign = 1;
         int state = 0;
+        boolean flag = false;
         s += "+";
         for(int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
+            if(i > 0 && (c == '(' && Character.isDigit(s.charAt(i - 1)) || Character.isDigit(c) && s.charAt(i - 1) == ')')){
+                if(!flag){
+                    c = '*';
+                    i --;
+                }
+                flag = !flag;
+            }
             if (Character.isDigit(c)){
                 cur[0] = cur[0] * 10 + Long.parseLong("" + c);
             } else if((c == '+' || c =='-') && (i == 0 || !Character.isDigit(s.charAt(i - 1)) && s.charAt(i - 1) != ')')){
@@ -183,13 +187,6 @@ public class CalculatorController1 implements CalculatorController {
         long n = a[0] * b[1] + b[0] * a[1], d = a[1]  *  b[1];
         return simplifyFraction(n, d);
     }
-
-    /*
-    private long[] subtract(long[] a, long[] b){
-        long n = a[0] * b[1] - b[0] * a[1], d = a[1]  *  b[1];
-        return simplifyFraction(n, d);
-    }
-    */
 
     public long[] simplifyFraction(long a, long b){
         long gcd = gcd(a, b);
