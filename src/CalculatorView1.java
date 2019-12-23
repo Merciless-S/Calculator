@@ -1,6 +1,5 @@
 //import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -43,7 +42,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
         this.bSubtract = new JButton("-");
         this.bMultiply = new JButton("*");
         this.bDivide = new JButton("/");
-        this.bPower = new JButton("^");
+        this.bPower = new JButton("^2");
         this.bRoot = new JButton("sqrt");
         this.bLeftParen = new JButton("(");
         this.bRightParen = new JButton(")");
@@ -56,6 +55,8 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
         for (int i = 0; i < 10; ++i) {
             this.bDigits[i] = new JButton("" + i);
         }
+        this.bPower.setBackground(Color.CYAN);
+        this.bRoot.setBackground(Color.CYAN);
 
         this.tTop.setEditable(false);
         this.tTop.setLineWrap(true);
@@ -178,6 +179,16 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
     }
 
     @Override
+    public void updateSqrtAllowed(boolean allowed) {
+        this.bRoot.setEnabled(allowed);
+    }
+
+    @Override
+    public void updatePowerAllowed(boolean allowed) {
+        this.bPower.setEnabled(allowed);
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source == this.bClear) {
@@ -190,6 +201,10 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
             this.controller.processEditEvent('*');
         } else if (source == this.bDivide) {
             this.controller.processEditEvent('/');
+        } else if(source == this.bPower){
+            this.controller.processPowerEvent();
+        } else if(source == this.bRoot){
+            this.controller.processRootEvent();
         } else if (source == this.bLeftParen) {
             this.controller.processEditEvent('(');
         } else if (source == this.bRightParen) {
@@ -217,8 +232,7 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-    }
+    public void keyTyped(KeyEvent e) { }
 
     @Override
     public void keyPressed(KeyEvent e) {

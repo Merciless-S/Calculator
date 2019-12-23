@@ -18,7 +18,7 @@ public class CalculatorController1 implements CalculatorController {
         updateViewToMatchModel(model, view);
     }
 
-    private static void updateViewToMatchModel(CalculatorModel model, CalculatorView view){
+    private void updateViewToMatchModel(CalculatorModel model, CalculatorView view){
         String topLeft = model.getTopLeft(), topRight = model.getTopRight(), bottom = model.getBottom();
         StringBuilder left = new StringBuilder(), right = new StringBuilder();
         if(topLeft.length() > 0) {
@@ -39,7 +39,8 @@ public class CalculatorController1 implements CalculatorController {
         }else{
             left.append("|");
         }
-        //view.updateTopDisplay(topLeft + "|" + topRight);
+        view.updatePowerAllowed(this.allowRootOrPower());
+        view.updateSqrtAllowed(this.allowRootOrPower());
         view.updateTopDisplay(left.toString());
         view.updateBottomDisplay(bottom);
     }
@@ -135,6 +136,16 @@ public class CalculatorController1 implements CalculatorController {
             }
         }
         updateViewToMatchModel(model, view);
+    }
+
+    @Override
+    public void processPowerEvent() {
+
+    }
+
+    @Override
+    public void processRootEvent() {
+
     }
 
     private long[] eval(String s){
@@ -291,5 +302,16 @@ public class CalculatorController1 implements CalculatorController {
         long bottom = (new Double(Math.pow(10, fraction[1].length()))).longValue();
         long top = Long.parseLong(fraction[0] + "" + fraction[1]);
         return simplifyFraction(top, bottom);
+    }
+
+    public boolean allowRootOrPower(){
+        String bottom = this.model.getBottom();
+        if(bottom.indexOf('/') != -1 || bottom.indexOf('(') != -1) return true;
+        try{
+            Double.parseDouble(bottom);
+        }catch(Exception e){
+            return false;
+        }
+        return true;
     }
 }

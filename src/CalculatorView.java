@@ -9,4 +9,8 @@ public interface CalculatorView extends ActionListener  {
     void updateBottomDisplay(String s);
 
     void updateTranAllowed(boolean allowed);
+
+    void updateSqrtAllowed(boolean allowed);
+
+    void updatePowerAllowed(boolean allowed);
 }
