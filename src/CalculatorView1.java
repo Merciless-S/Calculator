@@ -1,4 +1,3 @@
-//import java.awt.Cursor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -32,9 +31,10 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
     public CalculatorView1(){
         super("Merciless's Calculator");
 
-
+        /*
+         * Create widgets
+         */
         this.tTop = new JTextArea("", TEXT_AREA_HEIGHT, TEXT_AREA_WIDTH);
-        //this.tTop.addKeyListener(this);
         this.tBottom = new JTextArea("", TEXT_AREA_HEIGHT, TEXT_AREA_WIDTH);
         this.bClear = new JButton("Clear");
         this.bEnter = new JButton("Enter");
@@ -58,22 +58,40 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
         this.bPower.setBackground(Color.CYAN);
         this.bRoot.setBackground(Color.CYAN);
 
+        /*
+         * Text areas should wrap lines, and should be read-only; they cannot be
+         * edited because allowing keyboard entry would require checking whether
+         * entries are digits, which we don't want to have to do
+         */
         this.tTop.setEditable(false);
         this.tTop.setLineWrap(true);
         this.tTop.setWrapStyleWord(true);
         this.tBottom.setEditable(false);
         this.tBottom.setLineWrap(true);
         this.tBottom.setWrapStyleWord(true);
+
+        //The root, power and transform bottom should be disabled initially
         this.bRoot.setEnabled(false);
         this.bPower.setEnabled(false);
         this.bTran.setEnabled(false);
 
+        /*
+         * Create scroll panes for the text areas in case number is long enough
+         * to require scrolling
+         */
         JScrollPane tTopScrollPane = new JScrollPane(this.tTop);
         JScrollPane tBottomScrollPane = new JScrollPane(this.tBottom);
 
+        /*
+         * Create main button panel
+         */
         JPanel mainButtonPanel = new JPanel(new GridLayout(
                 MAIN_BUTTON_PANEL_GRID_ROWS, MAIN_BUTTON_PANEL_GRID_COLUMNS));
 
+        /*
+         * Add the buttons to the main button panel, from left to right and top
+         * to bottom
+         */
         mainButtonPanel.add(this.bDigits[7]);
         mainButtonPanel.add(this.bDigits[8]);
         mainButtonPanel.add(this.bDigits[9]);
@@ -95,27 +113,51 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
         mainButtonPanel.add(this.bLeftArrow);
         mainButtonPanel.add(this.bRightArrow);
 
-
+        /*
+         * Create side button panel
+         */
         JPanel sideButtonPanel = new JPanel(new GridLayout(
                 SIDE_BUTTON_PANEL_GRID_ROWS, SIDE_BUTTON_PANEL_GRID_COLUMNS));
 
+        /*
+         * Add the buttons to the side button panel, from left to right and top
+         * to bottom
+         */
         sideButtonPanel.add(this.bClear);
         sideButtonPanel.add(this.bEnter);
         sideButtonPanel.add(this.bDelete);
         sideButtonPanel.add(this.bTran);
         sideButtonPanel.add(this.bDot);
 
+        /*
+         * Create combined button panel organized using flow layout, which is
+         * simple and does the right thing: sizes of nested panels are natural,
+         * not necessarily equal as with grid layout
+         */
         JPanel combinedButtonPanel = new JPanel(new FlowLayout());
 
-
+        /*
+         * Add the other two button panels to the combined button panel
+         */
         combinedButtonPanel.add(mainButtonPanel);
         combinedButtonPanel.add(sideButtonPanel);
 
+        /*
+         * Organize main window
+         */
         this.setLayout(new GridLayout(CALC_GRID_ROWS, CALC_GRID_COLUMNS));
+
+        /*
+         * Add scroll panes and button panel to main window, from left to right
+         * and top to bottom
+         */
         this.add(tTopScrollPane);
         this.add(tBottomScrollPane);
         this.add(combinedButtonPanel);
 
+        /*
+         * Register this object as the observer for all GUI events
+         */
         for (JButton b : this.bDigits) {
             b.addActionListener(this);
             b.addKeyListener(this);
@@ -153,6 +195,10 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
         this.bRightArrow.addKeyListener(this);
         this.bDot.addKeyListener(this);
 
+        /*
+         * Make sure the main window is appropriately sized, exits this program
+         * on close, and becomes visible to the user
+         */
         this.pack();
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
@@ -190,6 +236,14 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        /*
+         * Determine which event has occurred that we are being notified of by
+         * this callback; in this case, the source of the event (i.e, the widget
+         * calling actionPerformed) is all we need because only buttons are
+         * involved here, so the event must be a button press; in each case,
+         * tell the controller to do whatever is needed to update the model and
+         * to refresh the view
+         */
         Object source = e.getSource();
         if (source == this.bClear) {
             this.controller.processClearEvent();
@@ -237,10 +291,15 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
+        //determine which key was pressed and give corresponding reaction (same as the buttons)
         if(key == KeyEvent.VK_LEFT){
             this.controller.processShiftEvent(-1);
         }else if(key == KeyEvent.VK_RIGHT){
             this.controller.processShiftEvent(1);
+        }else if(key == KeyEvent.VK_UP){
+            this.controller.processShiftEvent(2);
+        }else if(key == KeyEvent.VK_DOWN){
+            this.controller.processShiftEvent(-2);
         }else if(key == KeyEvent.VK_ENTER){
             this.controller.processEnterEvent();
         }else if(key == KeyEvent.VK_MINUS){
@@ -259,10 +318,14 @@ public class CalculatorView1 extends JFrame implements CalculatorView, KeyListen
             this.controller.processDeleteEvent();
         }else if(key == KeyEvent.VK_PERIOD){
             this.controller.processEditEvent('.');
-        }else if(key == KeyEvent.VK_C && !e.isControlDown()){
-            //this.controller.processClearEvent();
+        }else if(key == KeyEvent.VK_Q && !e.isControlDown()){
+            this.controller.processClearEvent();
         }else if(key == KeyEvent.VK_T && this.bTran.isEnabled()){
             this.controller.processTranEvent();
+        }else if(key == KeyEvent.VK_S && this.bRoot.isEnabled()){
+            this.controller.processRootEvent();
+        }else if(key == KeyEvent.VK_P && this.bPower.isEnabled()){
+            this.controller.processPowerEvent();
         }else{
             for(int i = 0; i < DIGIT_BUTTONS; i++){
                 if(key == i + KeyEvent.VK_0){

@@ -1,7 +1,13 @@
+/**
+ * @author Merciless
+ */
 public class CalculatorModel1 implements CalculatorModel {
 
     private String topLeft, topRight, bottom;
 
+    /**
+     * constructor
+     */
     public CalculatorModel1(){
         this.topLeft = "";
         this.topRight = "";
